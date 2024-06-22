@@ -34,7 +34,7 @@ const markSpam = async (req, res) => {
 const searchByName = async (req, res) => {
   const { name } = req.query;
   try {
-    const users = await User.findAll({
+    const usersStartWith = await User.findAll({
       where: {
         name: {
           [Op.iLike]: `${name}%`,
@@ -43,7 +43,7 @@ const searchByName = async (req, res) => {
       include: [{ model: Contact, attributes: ['phoneNumber', 'isSpam'] }],
     });
 
-    const otherUsers = await User.findAll({
+    const usersContain = await User.findAll({
       where: {
         name: {
           [Op.iLike]: `%${name}%`,
@@ -53,10 +53,12 @@ const searchByName = async (req, res) => {
       include: [{ model: Contact, attributes: ['phoneNumber', 'isSpam'] }],
     });
 
+    const searchResults = [...usersStartWith, ...usersContain];
+
     res.status(200).json({
       success: true,
       message: 'Search results',
-      data: [...users, ...otherUsers],
+      data: searchResults,
     });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
