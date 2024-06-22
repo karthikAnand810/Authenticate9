@@ -31,7 +31,12 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
     },
-    {},
+    {
+      indexes: [
+        { unique: true, fields: ['phoneNumber'] }, // Index on phoneNumber for quick lookup
+        { fields: ['name'] }, // Index on name for faster searching
+      ],
+    },
   );
 
   User.associate = function (models) {

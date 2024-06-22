@@ -30,33 +30,27 @@ const markSpam = async (req, res) => {
 };
 
 const searchByName = async (req, res) => {
-  const { name } = req.query;
+  const { name, page, pageSize } = req.query;
+  const limit = parseInt(pageSize) || 10;
+  const offset = (parseInt(page) - 1) * limit || 0;
+
   try {
-    const usersStartWith = await User.findAll({
+    const users = await User.findAndCountAll({
       where: {
         name: {
           [Op.iLike]: `${name}%`,
         },
       },
       include: [{ model: Contact, attributes: ['phoneNumber', 'isSpam'] }],
+      limit,
+      offset,
     });
-
-    const usersContain = await User.findAll({
-      where: {
-        name: {
-          [Op.iLike]: `%${name}%`,
-          [Op.notILike]: `${name}%`,
-        },
-      },
-      include: [{ model: Contact, attributes: ['phoneNumber', 'isSpam'] }],
-    });
-
-    const searchResults = [...usersStartWith, ...usersContain];
 
     res.status(200).json({
       success: true,
       message: 'Search results',
-      data: searchResults,
+      data: users.rows,
+      total: users.count,
     });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
@@ -64,32 +58,36 @@ const searchByName = async (req, res) => {
 };
 
 const searchByPhoneNumber = async (req, res) => {
-  const { phoneNumber } = req.query;
+  const { phoneNumber, page = 1, pageSize = 10 } = req.query; // Default page size to 10
+
+  const limit = parseInt(pageSize, 10);
+  const offset = (parseInt(page, 10) - 1) * limit;
+
   try {
-    // Check if there's a registered user with the phone number
     const user = await User.findOne({
       where: { phoneNumber },
-      attributes: ['name', 'email'], // Include only name and email for registered users
+      attributes: ['name', 'email', 'phoneNumber'],
     });
 
     if (user) {
-      // If a registered user is found, return only that user's details
       res.status(200).json({
         success: true,
-        message: 'Search results',
-        data: [user],
+        message: 'Search result',
+        data: user,
       });
     } else {
-      // If no registered user is found, return all contacts matching the phone number
-      const contacts = await Contact.findAll({
+      const contacts = await Contact.findAndCountAll({
         where: { phoneNumber },
-        include: [{ model: User, attributes: ['name'] }], // Include user's name for each contact
+        include: [{ model: User, attributes: ['name', 'phoneNumber'] }],
+        limit,
+        offset,
       });
 
       res.status(200).json({
         success: true,
         message: 'Search results',
-        data: contacts,
+        data: contacts.rows, // Send only the current page of results
+        total: contacts.count, // Total count of matching records
       });
     }
   } catch (error) {

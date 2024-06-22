@@ -15,7 +15,11 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 1,
       },
     },
-    {},
+    {
+      indexes: [
+        { unique: true, fields: ['phoneNumber'] }, // Index on phoneNumber for quick lookup
+      ],
+    },
   );
 
   return SpamNumber;

@@ -25,7 +25,12 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: false,
       },
     },
-    {},
+    {
+      indexes: [
+        { unique: true, fields: ['phoneNumber'] }, // Index on phoneNumber for quick lookup
+        { fields: ['name'] }, // Index on name for faster searching
+      ],
+    },
   );
 
   Contact.associate = function (models) {
