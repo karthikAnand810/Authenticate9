@@ -8,6 +8,15 @@ module.exports = {
     database: 'spam_checker_db',
     host: process.env.DB_HOST,
     dialect: 'postgres',
+    pool: {
+      max: 20,
+      min: 5,
+      acquire: 30000,
+      idle: 10000,
+    },
+    define: {
+      freezeTableName: true,
+    },
   },
   test: {
     username: process.env.DB_USERNAME,
