@@ -8,7 +8,8 @@ const markSpam = async (req, res) => {
   if (!validatePhoneNumber(phoneNumber)) {
     return res.status(400).json({
       success: false,
-      message: 'Invalid phone number',
+      message:
+        'Invalid phone number. Please provide a valid phone number in the format +1234567890',
     });
   }
 
