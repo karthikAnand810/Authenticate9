@@ -8,23 +8,20 @@ const markSpam = async (req, res) => {
   if (!validatePhoneNumber(phoneNumber)) {
     return res.status(400).json({
       success: false,
-      message:
-        'Invalid phone number. Please provide a valid phone number in the format +1234567890',
+      message: 'Invalid phone number. Please provide a valid phone number.',
     });
   }
 
   try {
-    // Check if the number is already marked as spam
     let spamNumber = await SpamNumber.findOne({ where: { phoneNumber } });
 
     if (spamNumber) {
-      // Increment the spam count if already marked
       spamNumber.spamCount += 1;
-      await spamNumber.save();
     } else {
-      // Create a new spam entry if not already marked
       spamNumber = await SpamNumber.create({ phoneNumber });
     }
+
+    await spamNumber.save();
 
     res.status(200).json({ success: true, message: 'Marked as spam', data: spamNumber });
   } catch (error) {
