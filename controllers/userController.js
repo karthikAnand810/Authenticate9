@@ -7,6 +7,11 @@ require('dotenv').config();
 const register = async (req, res) => {
   const { name, phoneNumber, password, email } = req.body;
 
+  // Check if the required fields are provided
+  if (!name || !phoneNumber || !password) {
+    return res.status(400).json({ error: 'Name, phone number, and password are required' });
+  }
+
   if (!validatePhoneNumber(phoneNumber)) {
     return res.status(400).json({ error: 'Invalid phone number' });
   }

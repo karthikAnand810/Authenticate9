@@ -1,27 +1,28 @@
-const { Contact, User, Sequelize } = require('../models');
+const { Contact, User, SpamNumber, Sequelize } = require('../models');
 const { Op } = Sequelize;
 const { validatePhoneNumber } = require('../utils/phoneValidation');
 
 const markSpam = async (req, res) => {
   const { phoneNumber } = req.body;
 
+  if (!validatePhoneNumber(phoneNumber)) {
+    return res.status(400).json({ error: 'Invalid phone number' });
+  }
+
   try {
-    const isValid = validatePhoneNumber(phoneNumber);
+    // Check if the number is already marked as spam
+    let spamNumber = await SpamNumber.findOne({ where: { phoneNumber } });
 
-    if (!isValid) {
-      // Mark the number as spam directly if it's invalid
-      await Contact.create({ phoneNumber, userId: req.user.id, isSpam: true });
-      return res.status(200).json({ message: 'Invalid number marked as spam' });
-    }
-
-    const contact = await Contact.findOne({ where: { phoneNumber, userId: req.user.id } });
-    if (contact) {
-      contact.isSpam = true;
-      await contact.save();
+    if (spamNumber) {
+      // Increment the spam count if already marked
+      spamNumber.spamCount += 1;
+      await spamNumber.save();
     } else {
-      await Contact.create({ phoneNumber, userId: req.user.id, isSpam: true });
+      // Create a new spam entry if not already marked
+      spamNumber = await SpamNumber.create({ phoneNumber });
     }
-    res.status(200).json({ message: 'Marked as spam' });
+
+    res.status(200).json({ message: 'Marked as spam', spamNumber });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

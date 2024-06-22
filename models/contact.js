@@ -1,16 +1,36 @@
-// models/contact.js
 module.exports = (sequelize, DataTypes) => {
-    const Contact = sequelize.define('Contact', {
-      name: DataTypes.STRING,
-      phoneNumber: DataTypes.STRING,
-      userId: DataTypes.INTEGER,
-      isSpam: DataTypes.BOOLEAN
-    }, {});
-    
-    Contact.associate = function(models) {
-      Contact.belongsTo(models.User, { foreignKey: 'userId' });
-    };
-  
-    return Contact;
+  const Contact = sequelize.define(
+    'Contact',
+    {
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: true,
+        },
+      },
+      phoneNumber: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: true,
+        },
+      },
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      isSpam: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+    },
+    {},
+  );
+
+  Contact.associate = function (models) {
+    Contact.belongsTo(models.User, { foreignKey: 'userId' });
   };
-  
+
+  return Contact;
+};
