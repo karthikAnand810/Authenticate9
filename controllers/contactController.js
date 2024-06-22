@@ -6,7 +6,10 @@ const markSpam = async (req, res) => {
   const { phoneNumber } = req.body;
 
   if (!validatePhoneNumber(phoneNumber)) {
-    return res.status(400).json({ error: 'Invalid phone number' });
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid phone number',
+    });
   }
 
   try {
@@ -22,9 +25,9 @@ const markSpam = async (req, res) => {
       spamNumber = await SpamNumber.create({ phoneNumber });
     }
 
-    res.status(200).json({ message: 'Marked as spam', spamNumber });
+    res.status(200).json({ success: true, message: 'Marked as spam', data: spamNumber });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ success: false, message: error.message });
   }
 };
 
@@ -50,9 +53,13 @@ const searchByName = async (req, res) => {
       include: [{ model: Contact, attributes: ['phoneNumber', 'isSpam'] }],
     });
 
-    res.json([...users, ...otherUsers]);
+    res.status(200).json({
+      success: true,
+      message: 'Search results',
+      data: [...users, ...otherUsers],
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ success: false, message: error.message });
   }
 };
 
@@ -64,9 +71,13 @@ const searchByPhoneNumber = async (req, res) => {
       include: [{ model: User, attributes: ['name', 'email'] }],
     });
 
-    res.json(contacts);
+    res.status(200).json({
+      success: true,
+      message: 'Search results',
+      data: contacts,
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ success: false, message: error.message });
   }
 };
 
