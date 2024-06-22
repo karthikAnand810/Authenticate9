@@ -68,16 +68,32 @@ const searchByName = async (req, res) => {
 const searchByPhoneNumber = async (req, res) => {
   const { phoneNumber } = req.query;
   try {
-    const contacts = await Contact.findAll({
+    // Check if there's a registered user with the phone number
+    const user = await User.findOne({
       where: { phoneNumber },
-      include: [{ model: User, attributes: ['name', 'email'] }],
+      attributes: ['name', 'email'], // Include only name and email for registered users
     });
 
-    res.status(200).json({
-      success: true,
-      message: 'Search results',
-      data: contacts,
-    });
+    if (user) {
+      // If a registered user is found, return only that user's details
+      res.status(200).json({
+        success: true,
+        message: 'Search results',
+        data: [user],
+      });
+    } else {
+      // If no registered user is found, return all contacts matching the phone number
+      const contacts = await Contact.findAll({
+        where: { phoneNumber },
+        include: [{ model: User, attributes: ['name'] }], // Include user's name for each contact
+      });
+
+      res.status(200).json({
+        success: true,
+        message: 'Search results',
+        data: contacts,
+      });
+    }
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
