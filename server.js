@@ -23,17 +23,12 @@ function startServer() {
   });
 }
 
-// Synchronize models and then start server (only in development)
-if (process.env.NODE_ENV === 'development') {
-  sequelize
-    .sync({ force: false }) // Use { force: true } to drop and recreate tables on each startup (not recommended for production)
-    .then(() => {
-      console.log('Database synchronized');
-      startServer();
-    })
-    .catch((err) => {
-      console.error('Unable to synchronize the database:', err);
-    });
-} else {
-  startServer(); // Start server without synchronizing models in other environments
-}
+sequelize
+  .sync({ force: false }) // Use { force: true } to drop and recreate tables on each startup (not recommended for production)
+  .then(() => {
+    console.log('Database synchronized');
+    startServer();
+  })
+  .catch((err) => {
+    console.error('Unable to synchronize the database:', err);
+  });
