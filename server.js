@@ -7,6 +7,11 @@ require('dotenv').config();
 const app = express();
 
 app.use(bodyParser.json());
+
+app.get('/', (req, res) => {
+  res.send('Welcome to Spam Detection API');
+});
+
 app.use('/users', userRoutes);
 app.use('/contacts', contactRoutes);
 
