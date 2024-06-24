@@ -19,19 +19,13 @@ module.exports = {
     },
   },
   test: {
-    username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
     database: 'spam_checker_db_test',
     url: process.env.DATABASE_URL_TEST,
-    host: process.env.DB_HOST,
     dialect: 'postgres',
   },
   production: {
-    username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
     database: 'spam_checker_db_prod',
     url: process.env.DATABASE_URL_PROD,
-    host: process.env.DB_HOST,
     dialect: 'postgres',
   },
 };
