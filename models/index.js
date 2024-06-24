@@ -5,13 +5,14 @@ const path = require('path');
 const Sequelize = require('sequelize');
 const process = require('process');
 const basename = path.basename(__filename);
+require('dotenv').config();
 const env = process.env.NODE_ENV || 'development';
 const config = require('../config/config')[env];
 const db = {};
 
 let sequelize;
-if (config.DB_URL) {
-  sequelize = new Sequelize(config.DB_URL);
+if (config.url) {
+  sequelize = new Sequelize(config.url);
 } else {
   sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
